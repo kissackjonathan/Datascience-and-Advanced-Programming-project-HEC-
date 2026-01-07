@@ -1,0 +1,39 @@
+# Pre-commit hooks configuration for code quality assurance
+# Runs automatically before each git commit to enforce standards
+# Install: pip install pre-commit && pre-commit install
+
+repos:
+  # Basic file hygiene and validation
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace        # Remove trailing whitespace
+      - id: end-of-file-fixer          # Ensure files end with empty
+      - id: check-yaml                 # Validate YAML syntax
+      - id: check-added-large-files    # Prevent committing large files (>500KB)
+        args: ['--maxkb=500']
+      - id: check-merge-conflict       # Detect unresolved merge conflicts
+
+  # Python code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black                      # Auto-format Python code (PEP8)
+        language_version: python3.10
+
+  # Import statement sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort                      # Sort imports alphabetically
+        args: ["--profile", "black"]   # Compatible with Black formatter
+
+  # Code quality linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8                     # Enforce PEP8 style + detect errors
+        args: [
+          '--max-line-length=100',     # Allow 100 chars per line
+          '--extend-ignore=E203,W503'  # Ignore Black compatibility conflicts
+        ]
