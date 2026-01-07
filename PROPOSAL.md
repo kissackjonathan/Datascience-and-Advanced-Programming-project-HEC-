@@ -9,7 +9,7 @@ Political stability is fundamental for a country — especially for its leadersh
 
 Planned Approach and Technologies
 I will draw on open international datasets:
-* Fund for Peace’s Fragile States Index (FSI) will serve as the target variable — a yearly stability score per country.
+* Fund for Peace’s Fragile States Index (FSI) will serve as the target variable — a yearly stability score per country(or, alternatively, any comparable quantitative indicator of national stability/fragility from another dataset, to be used as the target variable).
 * World Bank Open Data will provide features such as GDP per capita, unemployment, trade openness, inflation and public debt.
 * United Nations Development Programme (UNDP) Human Development Index will supply education, health and income components (social variables). The workflow will begin with data acquisition and cleaning.Then, I will code and use as a benchmark model using panel regression with fixed effect. Next I will train and compare various machine learning models (2 supervised,Random Forest, XGBoost, 1 semi-supervised, Label Spreading, and 1 unsupervised, K-means clustering ) to estimate each country’s stability score and compare them fo find best one.( As a stretch goal I may also include Monte Carlo simulations to explore causal impacts of major shocks and scenario-based future instability risk and see if it affects its stability score.)
 
