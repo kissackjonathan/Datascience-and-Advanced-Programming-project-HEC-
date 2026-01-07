@@ -1,0 +1,100 @@
+# CI/CD Pipeline for Political Stability Prediction Project
+# Automatically runs tests and code quality checks on every push
+#
+# Resources:
+# - YouTube tutorial: https://www.youtube.com/watch?v=kuUHV0I0YwM
+# - GitHub blog: https://github.blog/enterprise-software/ci-cd/build-ci-cd-pipeline-github-actions-four-steps/
+#
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Run on Ubuntu virtual machine
+
+    steps:
+      # Step 1: Clone repository code to virtual machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python 3.12
+      # Ensures tests run with same Python version as development environment
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Step 3: Cache pip packages for faster subsequent runs
+      # Reduces CI time by 2-3 minutes after first run
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('environment.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Step 4: Install project dependencies
+      # Installs all required packages for data science and testing
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scikit-learn matplotlib seaborn
+          pip install black isort flake8 pytest pytest-cov
+          pip install linearmodels xgboost statsmodels
+
+      # Step 5: Code quality check with flake8
+      # Enforces PEP8 style guidelines and detects common errors
+      # Fails CI if code quality issues are found
+      - name: Code quality - flake8
+        run: |
+          flake8 src/ --max-line-length=100 --extend-ignore=E203,W503
+
+      # Step 6: Code formatting check with black
+      # Ensures consistent code formatting across the project
+      # Fails CI if code is not properly formatted
+      - name: Code formatting - black
+        run: |
+          black --check src/
+
+      # Step 7: Import sorting check with isort
+      # Verifies imports are sorted alphabetically and grouped correctly
+      # Fails CI if imports are not properly organized
+      - name: Import sorting - isort
+        run: |
+          isort --check-only --profile black src/
+
+      # Step 8: Run automated tests with pytest
+      # Executes all tests and measures code coverage
+      # Requires minimum 50% code coverage to pass
+      - name: Run tests with pytest
+        run: |
+          pytest tests/ --cov=src --cov-report=term --cov-fail-under=50
+          echo "Coverage minimum: 50%"
+
+      # Step 9: Display custom status message
+      # Summarizes CI results for easy understanding
+      # Always runs even if previous steps failed
+      - name: Custom CI Status Message
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "CI/CD Pipeline Results"
+          echo "=========================================="
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "Status: SUCCESS - All checks passed"
+            echo "Your code meets quality standards"
+          else
+            echo "Status: FAILED - Some checks did not pass"
+            echo "Check the logs above to see what failed:"
+            echo "  - Code quality (flake8)"
+            echo "  - Code formatting (black)"
+            echo "  - Import sorting (isort)"
+            echo "  - Tests (pytest with 50% coverage)"
+          fi
+          echo "=========================================="
