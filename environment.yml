@@ -1,0 +1,33 @@
+name: political-stability-prediction
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  # Data manipulation and analysis
+  - numpy
+  - pandas
+  - scipy
+  # Machine learning
+  - scikit-learn
+  - joblib
+  # Visualization
+  - matplotlib
+  - seaborn
+  - plotly
+  # Development tools
+  - jupyter
+  - black
+  - isort
+  - flake8
+  - pre-commit
+  # Testing
+  - pytest
+  - pytest-cov
+  - pip:
+      - linearmodels  # Panel regression
+      - xgboost       # Gradient boosting
+      - optuna>=4.0.0  # Bayesian hyperparameter optimization
+      - statsmodels   # Statistical models
+      - streamlit>=1.28.0  # Dashboard
