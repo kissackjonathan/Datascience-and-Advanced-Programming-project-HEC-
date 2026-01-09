@@ -851,3 +851,102 @@ def get_train_test_split(
     df_test = df[df["Year"] > train_end_year].copy()
 
     return df_train, df_test
+
+
+# ============================================================================
+# CONVERSION UTILITY SCRIPT
+# ============================================================================
+
+
+def convert_all_numbers_to_csv(data_path: Optional[Path] = None) -> int:
+    """
+    Convert all .numbers files in a directory to CSV format.
+
+    This is a utility function to batch-convert Apple Numbers files to CSV
+    for cross-platform compatibility. Primarily intended to be run on Mac
+    before committing data files to version control.
+
+    Parameters
+    ----------
+    data_path : Optional[Path]
+        Path to directory containing .numbers files.
+        If None, uses project_root/data/raw/
+
+    Returns
+    -------
+    int
+        Number of files successfully converted
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> converted = convert_all_numbers_to_csv(Path("data/raw"))
+    >>> print(f"Converted {converted} files")
+    """
+    if data_path is None:
+        # Assume this file is in src/, so parent/parent is project root
+        project_root = Path(__file__).parent.parent
+        data_path = project_root / "data" / "raw"
+
+    data_path = Path(data_path)
+
+    if not data_path.exists():
+        logger.error(f"Directory {data_path} does not exist!")
+        return 0
+
+    # Find all .numbers files
+    numbers_files = list(data_path.glob("*.numbers"))
+
+    if not numbers_files:
+        logger.warning(f"No .numbers files found in {data_path}")
+        return 0
+
+    logger.info(f"Converting {len(numbers_files)} .numbers files to CSV")
+
+    converted = 0
+    for numbers_file in numbers_files:
+        csv_file = convert_numbers_to_csv(numbers_file)
+        if csv_file:
+            converted += 1
+
+    logger.info(
+        f"Conversion complete: {converted}/{len(numbers_files)} files converted"
+    )
+
+    return converted
+
+
+if __name__ == "__main__":
+    """
+    Run this module as a script to convert all .numbers files to CSV.
+
+    Usage:
+        python src/data_loader.py
+        python -m src.data_loader
+    """
+    import logging
+
+    # Configure logging for script mode
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s: %(message)s",
+        handlers=[logging.StreamHandler()],
+    )
+
+    print("\n" + "=" * 70)
+    print("CONVERT .NUMBERS FILES TO .CSV")
+    print("=" * 70 + "\n")
+
+    converted = convert_all_numbers_to_csv()
+
+    print("\n" + "=" * 70)
+    print(f"✓ CONVERSION COMPLETE: {converted} files converted")
+    print("=" * 70 + "\n")
+
+    if converted > 0:
+        print("Next steps:")
+        print("1. Commit the CSV files:")
+        print("   git add data/raw/*.csv")
+        print("   git commit -m 'Add CSV versions of data files'")
+        print("   git push")
+        print("\n2. Or copy manually to Windows\n")
