@@ -10,60 +10,125 @@ This project predicts political stability across 191 countries using 28 years of
 
 ## Setup
 
+### Option 1: With Conda (Recommended)
+
+**Prerequisites:** Install [Anaconda](https://www.anaconda.com/download) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
+#### On Mac/Linux:
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/political-stability-observatory.git
-cd Datascience-and-Advanced-Programming-2025-2026-project-JK
+git clone https://github.com/kissackjonathan/Datascience-and-Advanced-Programming-project-HEC-.git
+cd Datascience-and-Advanced-Programming-project-HEC-
 
-# Create environment
+# Create and activate environment
 conda env create -f environment.yml
 conda activate political-stability-prediction
+
+# Launch interactive terminal
+python main/main.py
+```
+
+#### On Windows (PowerShell or Command Prompt):
+```powershell
+# Clone repository
+git clone https://github.com/kissackjonathan/Datascience-and-Advanced-Programming-project-HEC-.git
+cd Datascience-and-Advanced-Programming-project-HEC-
+
+# Create and activate environment
+conda env create -f environment.yml
+conda activate political-stability-prediction
+
+# Launch interactive terminal
+python main/main.py
+```
+
+### Option 2: With pip + venv
+
+#### On Mac/Linux:
+```bash
+# Clone repository
+git clone https://github.com/kissackjonathan/Datascience-and-Advanced-Programming-project-HEC-.git
+cd Datascience-and-Advanced-Programming-project-HEC-
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch interactive terminal
+python main/main.py
+```
+
+#### On Windows (PowerShell):
+```powershell
+# Clone repository
+git clone https://github.com/kissackjonathan/Datascience-and-Advanced-Programming-project-HEC-.git
+cd Datascience-and-Advanced-Programming-project-HEC-
+
+# Create virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch interactive terminal
+python main/main.py
+```
+
+### Important Note for Mac Users
+
+If you have `.numbers` data files (Apple Numbers format), convert them to `.csv` for cross-platform compatibility:
+
+```bash
+# Install numbers-parser
+pip install numbers-parser
+
+# Run conversion script
+python convert_numbers_to_csv.py
+
+# Commit the CSV files
+git add data/raw/*.csv
+git commit -m "Add CSV data files"
+git push
 ```
 
 ## Usage
 
-### Getting Started from VSCode
+### Interactive Terminal (Main Interface)
 
-If you're opening the project for the first time in VSCode:
+The interactive terminal is the primary way to use this project. Launch it with:
 
-1. **Open the project folder**
-   - Launch VSCode
-   - `File > Open Folder...` (or `Ctrl+K Ctrl+O` on Windows/Linux, `Cmd+K Cmd+O` on Mac)
-   - Navigate to and select `Datascience-and-Advanced-Programming-2025-2026-project-JK`
+```bash
+python main/main.py
+```
 
-2. **Open a terminal**
-   - `Terminal > New Terminal` (or press `` Ctrl+` `` / `` Cmd+` ``)
-   - The terminal should automatically open in the project root directory
+**Menu Options:**
+```
+================================================================================
+                    POLITICAL STABILITY PREDICTION SYSTEM
+================================================================================
 
-3. **Verify you're in the correct directory**
-   ```bash
-   pwd  # Should display: /path/to/Datascience-and-Advanced-Programming-2025-2026-project-JK
-   ls   # Should show: main/ src/ data/ tests/ README.md environment.yml
-   ```
+[0] Check Environment          - Verify setup and data files
+[1] Run Data Preparation       - Load, clean, and merge datasets
+[2] Train Model                - Train ML models with hyperparameter tuning
+[3] Test Model                 - Evaluate trained models on test set
+[4] Evaluate Saved Models      - Compare all saved model results
+[5] Run Visualization          - Generate plots and analysis charts
+[6] Show Dashboard Link        - Get Streamlit dashboard URL
+[7] Test Coverage              - Run pytest test suite
+[Q] Quit                       - Exit the program
+```
 
-4. **Activate the conda environment** (if not already active)
-   ```bash
-   conda activate political-stability-prediction
-   ```
-
-5. **Launch the interactive terminal**
-   ```bash
-   python main/main.py
-   ```
-
-### Interactive Terminal
-
-Once launched, the terminal menu offers:
-
-Menu options:
-- **[1]** Run Data Preparation
-- **[2]** Train Model (7 ML + Dynamic Panel)
-- **[3]** Test Model
-- **[4]** Evaluate Saved Models
-- **[5]** Run Visualization
-- **[6]** Show Dashboard Link
-- **[7]** Test Coverage
-- **[Q]** Quit
+**Typical Workflow:**
+1. **[0]** Check Environment - Verify all packages and data files
+2. **[1]** Run Data Preparation - Load and process data
+3. **[2]** Train Model - Train all 7 ML models + Panel model
+4. **[3]** Test Model - Evaluate on test set
+5. **[5]** Run Visualization - Generate result plots
+6. **[6]** Show Dashboard - Launch interactive dashboard
 
 ### Interactive Dashboard
 

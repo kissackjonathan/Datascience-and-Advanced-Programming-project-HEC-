@@ -31,3 +31,5 @@ dependencies:
       - optuna>=4.0.0  # Bayesian hyperparameter optimization
       - statsmodels   # Statistical models
       - streamlit>=1.28.0  # Dashboard
+      - openpyxl>=3.0.0  # Read Excel files (.xlsx)
+      - numbers-parser>=4.0.0  # Read Apple Numbers files (.numbers)
