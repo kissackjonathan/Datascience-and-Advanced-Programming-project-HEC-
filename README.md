@@ -142,6 +142,8 @@ Dashboard opens at `http://localhost:8501` with 3 pages:
 - **Explorer**: Country-level analysis and trends
 - **Project**: Complete ML workflow (Load Data → Train → Test → Visualize)
 
+**Note:** If the dashboard doesn't open automatically in your browser, manually copy and paste this URL: `http://localhost:8501`
+
 ## Project Structure
 
 ```
