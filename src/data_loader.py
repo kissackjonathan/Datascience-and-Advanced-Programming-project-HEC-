@@ -26,6 +26,87 @@ except ImportError:
 
 
 # ============================================================================
+# CONVERSION UTILITIES
+# ============================================================================
+
+
+def convert_numbers_to_csv(numbers_file: Path) -> Optional[Path]:
+    """
+    Convert an Apple Numbers file to CSV format.
+
+    This utility function reads a .numbers file and exports it as a .csv file
+    in the same directory. Primarily used for cross-platform compatibility,
+    allowing Windows users to work with data originally created on Mac.
+
+    Parameters
+    ----------
+    numbers_file : Path
+        Path to the .numbers file to convert
+
+    Returns
+    -------
+    Optional[Path]
+        Path to the created CSV file, or None if conversion failed
+
+    Notes
+    -----
+    - Requires numbers-parser package (Mac only)
+    - Takes the first sheet and first table from the Numbers file
+    - Preserves all cell values (text, numbers, dates)
+    - CSV file is created in the same directory as the source file
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> numbers_file = Path("data/raw/GDP per capita.numbers")
+    >>> csv_file = convert_numbers_to_csv(numbers_file)
+    >>> print(csv_file)
+    data/raw/GDP per capita.csv
+    """
+    import csv
+
+    numbers_file = Path(numbers_file)
+
+    if not NUMBERS_PARSER_AVAILABLE:
+        logger.error(
+            "numbers-parser not installed. Install with: pip install numbers-parser"
+        )
+        return None
+
+    try:
+        # Read the .numbers file
+        doc = Document(str(numbers_file))
+
+        # Get first sheet
+        sheets = doc.sheets
+        if not sheets:
+            logger.warning(f"No sheets found in {numbers_file.name}")
+            return None
+
+        table = sheets[0].tables[0]
+
+        # Create CSV file path
+        csv_file = numbers_file.with_suffix(".csv")
+
+        # Extract data from all rows
+        data = []
+        for row in table.rows():
+            data.append([cell.value for cell in row])
+
+        # Write to CSV
+        with open(csv_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+
+        logger.info(f"Converted: {numbers_file.name} → {csv_file.name}")
+        return csv_file
+
+    except Exception as e:
+        logger.error(f"Failed to convert {numbers_file.name}: {e}")
+        return None
+
+
+# ============================================================================
 # COUNTRY WHITELISTS
 # ============================================================================
 # 193 UN member states (2024), using World Bank naming

@@ -87,7 +87,7 @@ If you have `.numbers` data files (Apple Numbers format), convert them to `.csv`
 pip install numbers-parser
 
 # Run conversion script
-python convert_numbers_to_csv.py
+python scripts/convert_data.py
 
 # Commit the CSV files
 git add data/raw/*.csv
