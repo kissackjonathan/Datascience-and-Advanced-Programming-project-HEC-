@@ -194,30 +194,44 @@ Datascience-and-Advanced-Programming-2025-2026-project-JK/
 
 | Rank | Model                      | Test R² | Test RMSE | Test MAE |
 |:----:|:---------------------------|--------:|----------:|---------:|
-| 1st  | Random Forest              |  0.7528 |    0.4813 |   0.3775 |
-| 2nd  | XGBoost                    |  0.7344 |    0.4989 |   0.3925 |
-| 3rd  | Gradient Boosting          |  0.7245 |    0.5081 |   0.3990 |
-| 4th  | KNN                        |  0.7127 |    0.5188 |   0.4030 |
-| 5th  | MLP                        |  0.6969 |    0.5329 |   0.4225 |
-| 6th  | Elastic Net                |  0.6297 |    0.5891 |   0.4701 |
-| 7th  | SVR                        |  0.6237 |    0.5938 |   0.4650 |
+| 1st  | Gradient Boosting          |  0.8080 |    0.4242 |   0.3207 |
+| 2nd  | XGBoost                    |  0.8013 |    0.4316 |   0.3242 |
+| 3rd  | Random Forest              |  0.7952 |    0.4381 |   0.3409 |
+| 4th  | KNN                        |  0.7141 |    0.5176 |   0.3680 |
+| 5th  | MLP                        |  0.6845 |    0.5437 |   0.4119 |
+| 6th  | SVR                        |  0.6778 |    0.5495 |   0.4232 |
+| 7th  | Elastic Net                |  0.6322 |    0.5871 |   0.4648 |
 
-**Winner**: Random Forest (best test performance with R²=0.7528)
+**Winner**: Gradient Boosting (best test performance with R²=0.8080)
 
 ### Key Findings
-- **Random Forest achieves best test performance (R²=0.7528, RMSE=0.4813)**
-- Tree-based models (RF, XGBoost, GBM) are best ML approaches
+- **Gradient Boosting achieves best test performance (R²=0.8080, RMSE=0.4242)**
+- Tree-based ensemble models (GBM, XGBoost, RF) dominate top 3 positions
+- All top-3 models achieve R² > 0.79, explaining over 79% of variance
 - No significant overfitting detected (train-test gap < 0.1)
 
-### Most Important Features (Random Forest)
-1. Rule of Law (37.34%)
-2. Government Effectiveness (21.25%)
-3. GDP per Capita (12.60%)
-4. HDI (8.73%)
-5. Trade (8.65%)
-6. Unemployment (4.95%)
-7. Inflation (4.00%)
-8. GDP Growth (2.47%)
+### Dynamic Panel Fixed Effects Model (Econometric Benchmark)
+
+The Panel Analyzer implements a two-way fixed effects model with dynamic structure:
+
+**Model Specification:**
+```
+Y_it = α + βY_{i,t-1} + γX_it + μ_i + ε_it
+```
+
+Where:
+- Y_it: Political stability for country i at time t
+- Y_{i,t-1}: Lagged dependent variable (captures persistence)
+- X_it: Macroeconomic and governance predictors
+- μ_i: Country-specific fixed effects
+- ε_it: Idiosyncratic error term
+
+**Diagnostic Tests:**
+- Hausman Test: Tests for correlation between effects and regressors
+- Breusch-Pagan Test: Detects heteroscedasticity
+- Durbin-Watson Test: Checks for serial correlation
+
+This classical econometric approach provides interpretable coefficients and serves as a benchmark for comparing ML model performance.
 
 ## Requirements
 

@@ -1,7 +1,7 @@
 """
 Data Loading and Preprocessing Module.
 
-This module provides comprehensive data loading and preprocessing capabilities for
+This module provides  data loading and preprocessing capabilities for
 panel data analysis, specifically designed for macroeconomic time series prediction.
 Handles data from multiple sources including World Bank, UNDP, and Worldwide Governance
 Indicators, transforming wide-format raw data into cleaned, imputed panel datasets.
@@ -17,7 +17,7 @@ Core Functionality
 
 Data Pipeline
 -------------
-1. Load & Merge: World Bank format files (outer join on Country × Year)
+1. Load & Merge: World Bank format files (outer join on Country x Year)
 2. Quality Control: UN whitelist filter, remove countries with >30% missing data
 3. Temporal Split: Separate training and test sets by year cutoff
 4. Imputation: Progressive window median fill, learned on training data only
@@ -99,7 +99,7 @@ def convert_numbers_to_csv(numbers_file: Path) -> Optional[Path]:
 # ============================================================================
 
 UN_MEMBER_STATES = [
-    # (unchanged: your full list)
+    # (unchanged full list)
     "Afghanistan",
     "Albania",
     "Algeria",
@@ -370,11 +370,6 @@ def _detect_year_columns(df):
     -------
     list
         List of column names representing years
-
-    Notes
-    -----
-    Handles both integer and float column names (e.g., 1960 or 1960.0 from Numbers files).
-    Excludes 'Country Name', 'Country Code', and 'Year' from detection.
     """
     year_cols = []
     for c in df.columns:
@@ -406,10 +401,6 @@ def _standardize_country_col(df):
     pd.DataFrame
         DataFrame with standardized 'Country Name' column
 
-    Notes
-    -----
-    Recognized variations: 'Country Name', 'Country', 'Country name',
-    'country_name', 'country'. If none found, uses first column as fallback.
     """
     candidates = {"Country Name", "Country", "Country name", "country_name", "country"}
     found = candidates & set(df.columns)
@@ -438,20 +429,6 @@ def load_data_file(file_path: str, indicator_name: str) -> Optional[pd.DataFrame
         Long-format DataFrame with columns: Country Name, [Country Code], Year, indicator_name.
         Returns None if the file cannot be loaded or contains no valid year columns.
 
-    Notes
-    -----
-    - Automatically skips World Bank metadata rows (first 4 rows)
-    - Detects year columns in range 1900-2100
-    - Standardizes country name column variations (Country, country, etc.)
-    - Numbers files require numbers-parser package (Mac only)
-
-    Examples
-    --------
-    >>> df = load_data_file('data/raw/GDP per capita.csv', 'gdp_per_capita')
-    >>> df.head()
-       Country Name  Year  gdp_per_capita
-    0        France  2018          42000.0
-    1        France  2019          43000.0
     """
     file_path = Path(file_path)
 
@@ -1004,7 +981,7 @@ if __name__ == "__main__":
     converted = convert_all_numbers_to_csv()
 
     print("\n" + "=" * 70)
-    print(f"✓ CONVERSION COMPLETE: {converted} files converted")
+    print(f"CONVERSION COMPLETE: {converted} files converted")
     print("=" * 70 + "\n")
 
     if converted > 0:
