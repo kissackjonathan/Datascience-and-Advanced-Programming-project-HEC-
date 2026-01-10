@@ -153,3 +153,143 @@ def test_load_data_full_pipeline():
 
     # Verify no missing values in features
     assert result["X_train"].isnull().sum().sum() == 0
+
+
+def test_convert_numbers_to_csv_missing_parser():
+    """
+    Test convert_numbers_to_csv when numbers-parser is not available.
+
+    Verifies that the function gracefully handles the absence of the
+    numbers-parser package by returning None instead of crashing.
+    """
+    import unittest.mock as mock
+
+    from src.data_loader import convert_numbers_to_csv
+
+    # Mock NUMBERS_PARSER_AVAILABLE = False
+    with mock.patch("src.data_loader.NUMBERS_PARSER_AVAILABLE", False):
+        result = convert_numbers_to_csv(Path("fake.numbers"))
+        assert result is None
+
+
+def test_convert_all_numbers_to_csv_no_directory():
+    """
+    Test convert_all_numbers_to_csv with non-existent directory.
+
+    Verifies that the function returns 0 when the specified directory
+    does not exist, rather than raising an exception.
+    """
+    from src.data_loader import convert_all_numbers_to_csv
+
+    result = convert_all_numbers_to_csv(Path("/fake/path/that/doesnt/exist"))
+    assert result == 0
+
+
+def test_convert_all_numbers_to_csv_no_files(temp_dir):
+    """
+    Test convert_all_numbers_to_csv with empty directory.
+
+    Verifies that the function returns 0 when no .numbers files are
+    found in the specified directory.
+    """
+    from src.data_loader import convert_all_numbers_to_csv
+
+    raw_dir = temp_dir / "raw"
+    raw_dir.mkdir()
+
+    result = convert_all_numbers_to_csv(raw_dir)
+    assert result == 0
+
+
+def test_detect_year_columns():
+    """
+    Test _detect_year_columns helper function.
+
+    Verifies that year columns are correctly identified in dataframes
+    while excluding non-year columns and special columns like Country Name.
+    """
+    from src.data_loader import _detect_year_columns
+
+    # Create test dataframe with year and non-year columns
+    df = pd.DataFrame(
+        {
+            "Country Name": ["France"],
+            "2018": [100],
+            "2019": [200],
+            "2020": [300],
+            "invalid": [1],
+            "text_col": ["data"],
+        }
+    )
+
+    year_cols = _detect_year_columns(df)
+
+    assert "2018" in year_cols
+    assert "2019" in year_cols
+    assert "2020" in year_cols
+    assert "invalid" not in year_cols
+    assert "text_col" not in year_cols
+    assert "Country Name" not in year_cols
+
+
+def test_standardize_country_col():
+    """
+    Test _standardize_country_col helper function.
+
+    Verifies that various country column names are correctly standardized
+    to the canonical 'Country Name' format.
+    """
+    from src.data_loader import _standardize_country_col
+
+    # Test with 'Country' column
+    df1 = pd.DataFrame({"Country": ["France", "Germany"], "Year": [2018, 2018]})
+    df1_std = _standardize_country_col(df1)
+    assert "Country Name" in df1_std.columns
+    assert "Country" not in df1_std.columns
+
+    # Test with 'country' column
+    df2 = pd.DataFrame({"country": ["France", "Germany"], "Year": [2018, 2018]})
+    df2_std = _standardize_country_col(df2)
+    assert "Country Name" in df2_std.columns
+
+    # Test with already standardized column
+    df3 = pd.DataFrame({"Country Name": ["France", "Germany"], "Year": [2018, 2018]})
+    df3_std = _standardize_country_col(df3)
+    assert "Country Name" in df3_std.columns
+
+
+def test_load_data_file_unsupported_format(temp_dir):
+    """
+    Test load_data_file with unsupported file format.
+
+    Verifies that the function returns None when given a file with
+    an unsupported extension rather than raising an exception.
+    """
+    from src.data_loader import load_data_file
+
+    # Create a file with unsupported extension
+    unsupported_file = temp_dir / "data.txt"
+    unsupported_file.write_text("Some data")
+
+    result = load_data_file(str(unsupported_file), "test_indicator")
+    assert result is None
+
+
+def test_load_data_file_csv_without_years(temp_dir):
+    """
+    Test load_data_file with CSV that has no year columns.
+
+    Verifies that the function handles files without valid year columns
+    by returning None with an appropriate warning.
+    """
+    from src.data_loader import load_data_file
+
+    # Create CSV without year columns
+    csv_path = temp_dir / "no_years.csv"
+    with open(csv_path, "w") as f:
+        f.write("Country Name,Value\n")
+        f.write("France,100\n")
+        f.write("Germany,200\n")
+
+    result = load_data_file(str(csv_path), "test_indicator")
+    assert result is None

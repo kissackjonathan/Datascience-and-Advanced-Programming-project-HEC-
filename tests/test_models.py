@@ -508,3 +508,159 @@ class TestPanelAnalyzer:
         # P-values should be between 0 and 1
         assert 0 <= hetero["lm_pvalue"] <= 1
         assert 0 <= hetero["f_pvalue"] <= 1
+
+
+def test_regression_metrics():
+    """
+    Test regression_metrics utility function.
+
+    Verifies that the regression metrics function correctly computes
+    R-squared, adjusted R-squared, F-statistic, RMSE, and MAE for
+    a given set of predictions and ground truth values.
+    """
+    from src.models import regression_metrics
+
+    # Create synthetic predictions with good fit
+    y_true = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
+    y_pred = np.array([1.1, 2.0, 2.9, 4.2, 4.8, 6.1, 7.0, 7.9])
+
+    metrics = regression_metrics(y_true, y_pred, n_features=2)
+
+    # Verify all expected metrics are present
+    assert "r2" in metrics
+    assert "adj_r2" in metrics
+    assert "f_stat" in metrics
+    assert "f_pvalue" in metrics
+    assert "rmse" in metrics
+    assert "mae" in metrics
+    assert "n_samples" in metrics
+    assert "n_features" in metrics
+
+    # Verify metric values are reasonable
+    assert 0 <= metrics["r2"] <= 1
+    assert metrics["adj_r2"] <= metrics["r2"]
+    assert metrics["f_stat"] > 0
+    assert 0 <= metrics["f_pvalue"] <= 1
+    assert metrics["rmse"] > 0
+    assert metrics["mae"] > 0
+    assert metrics["n_samples"] == 8
+    assert metrics["n_features"] == 2
+
+
+def test_panel_analyzer_with_invalid_index(panel_data):
+    """
+    Test PanelAnalyzer with non-MultiIndex data.
+
+    Verifies that PanelAnalyzer properly handles data without a MultiIndex
+    by raising an appropriate error rather than producing incorrect results.
+    """
+    from src.models import PanelAnalyzer
+
+    # Create data without MultiIndex (should fail)
+    X = pd.DataFrame({"x1": [1, 2, 3, 4, 5], "x2": [2, 3, 4, 5, 6]})
+    y = pd.Series([1, 2, 3, 4, 5])
+
+    analyzer = PanelAnalyzer()
+
+    # Should raise an exception because data lacks proper panel structure
+    with pytest.raises(Exception):
+        analyzer.fit(X, y)
+
+
+def test_panel_analyzer_save_load(panel_data, temp_dir):
+    """
+    Test PanelAnalyzer model saving and loading.
+
+    Verifies that a trained PanelAnalyzer can be serialized to disk
+    and loaded back with preserved parameters and predictions.
+    """
+    from src.models import PanelAnalyzer
+
+    # Prepare panel data
+    panel_data = panel_data.set_index(["Country Name", "Year"])
+    X = panel_data[["gdp_per_capita", "unemployment"]]
+    y = panel_data["political_stability"]
+
+    # Train and save
+    analyzer = PanelAnalyzer()
+    analyzer.fit(X, y)
+
+    save_path = temp_dir / "panel_model.pkl"
+    analyzer.save(str(save_path))
+
+    # Load and verify
+    loaded_analyzer = PanelAnalyzer.load(str(save_path))
+    assert loaded_analyzer is not None
+
+    # Verify predictions match
+    original_pred = analyzer.predict(X)
+    loaded_pred = loaded_analyzer.predict(X)
+
+    np.testing.assert_array_almost_equal(original_pred, loaded_pred, decimal=5)
+
+
+def test_base_predictor_evaluate_without_fit():
+    """
+    Test BasePredictor evaluate method before fitting.
+
+    Verifies that calling evaluate on an unfitted model raises
+    an appropriate exception.
+    """
+    from src.models import RandomForestPredictor
+
+    predictor = RandomForestPredictor()
+    X = np.random.rand(50, 5)
+    y = np.random.rand(50)
+
+    # Should raise an exception because model is not fitted
+    with pytest.raises(Exception):
+        predictor.evaluate(X, y)
+
+
+def test_xgboost_predictor_without_xgboost():
+    """
+    Test XGBoostPredictor when XGBoost is not available.
+
+    Verifies that the predictor gracefully handles the absence of
+    the XGBoost library rather than crashing during import.
+    """
+    from src.models import XGBOOST_AVAILABLE
+
+    # If XGBoost is not available, this test verifies the flag works correctly
+    if not XGBOOST_AVAILABLE:
+        from src.models import XGBoostPredictor
+
+        predictor = XGBoostPredictor()
+        assert predictor is not None
+
+
+def test_model_cv_results_structure(small_panel_data):
+    """
+    Test cross-validation results structure.
+
+    Verifies that the cv_results attribute contains expected keys
+    and has proper structure after model fitting with cross-validation.
+    """
+    from src.models import RandomForestPredictor
+
+    X = small_panel_data[["gdp_per_capita", "unemployment"]]
+    y = small_panel_data["political_stability"]
+
+    predictor = RandomForestPredictor()
+
+    # Fit with minimal hyperparameter grid
+    param_grid = {"n_estimators": [10, 20], "max_depth": [3, 5]}
+    predictor.fit(X, y, param_grid=param_grid, n_trials=2, cv=2)
+
+    # Verify cv_results structure
+    assert predictor.cv_results is not None
+    assert "mean_test_score" in predictor.cv_results
+    assert "std_test_score" in predictor.cv_results
+    assert "params" in predictor.cv_results
+
+    # Verify scores are valid
+    assert all(
+        isinstance(score, (int, float))
+        for score in predictor.cv_results["mean_test_score"]
+    )
+    assert all(score <= 1.0 for score in predictor.cv_results["mean_test_score"])

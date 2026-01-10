@@ -8,6 +8,16 @@
 ## Overview
 This project predicts political stability across 191 countries using 28 years of data (1996-2023) from World Bank, UNDP, and Worldwide Governance Indicators. We compare 7 machine learning models (Random Forest, XGBoost, Gradient Boosting, Elastic Net, SVR, KNN, MLP) against a Dynamic Panel Fixed Effects econometric benchmark. All ML models use Optuna Bayesian hyperparameter optimization with temporal train-test splitting (1996-2017 train, 2018-2023 test). The system includes an interactive terminal for model training/testing and a Streamlit dashboard for visualization and country-level analysis.
 
+## Prerequisites
+
+**Git must be installed to clone this repository.**
+
+- **Mac**: Install via Homebrew: `brew install git` or [Xcode Command Line Tools](https://developer.apple.com/xcode/)
+- **Windows**: Download from [git-scm.com](https://git-scm.com/download/win)
+- **Linux**: `sudo apt-get install git` (Ubuntu/Debian) or `sudo yum install git` (RedHat/CentOS)
+
+Verify installation: `git --version`
+
 ## Setup
 
 ### Option 1: With Conda (Recommended)
