@@ -22,24 +22,7 @@ Verify installation: `git --version`
 
 ### Option 1: With Conda (Recommended)
 
-**Prerequisites:** Install [Anaconda](https://www.anaconda.com/download) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-
-#### On Mac/Linux:
 ```bash
-# Clone repository
-git clone https://github.com/kissackjonathan/Datascience-and-Advanced-Programming-project-HEC-.git
-cd Datascience-and-Advanced-Programming-project-HEC-
-
-# Create and activate environment
-conda env create -f environment.yml
-conda activate political-stability-prediction
-
-# Launch interactive terminal
-python main/main.py
-```
-
-#### On Windows (PowerShell or Command Prompt):
-```powershell
 # Clone repository
 git clone https://github.com/kissackjonathan/Datascience-and-Advanced-Programming-project-HEC-.git
 cd Datascience-and-Advanced-Programming-project-HEC-
